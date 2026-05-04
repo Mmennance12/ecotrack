@@ -156,7 +156,7 @@ function Reports() {
                     reports.map((report) => (
                       <tr
                         key={report._id}
-                        className="border-t border-gray-100 hover:bg-gray-50 transition cursor-pointer"
+                        className="border-t border-gray-200 hover:bg-gray-50 transition cursor-pointer"
                       >
                         {/* Type with Color Indicator */}
                         <td className="px-6 py-4 font-medium text-gray-800">

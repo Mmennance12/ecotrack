@@ -15,6 +15,109 @@ const buildQueryFeatures = (req, baseFilter = {}) => {
   return { filter, page, limit, skip };
 };
 
+// ------------------ DRIVER ------------------
+
+const getDriverAssignedReports = async (req, res) => {
+  try {
+    const driverRecord = await Driver.findOne({ userId: req.user._id });
+    const orFilters = [
+      { assignedTo: req.user._id },
+      { "assignedDriver.name": req.user.name },
+    ];
+
+    if (driverRecord) {
+      orFilters.push({ assignedTo: driverRecord._id });
+      orFilters.push({ "assignedDriver.id": driverRecord._id.toString() });
+    }
+
+    const reports = await WasteReport.find({ $or: orFilters })
+      .populate("createdBy", "name")
+      .sort({ createdAt: -1 });
+
+    res.json(reports);
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+const updateDriverReportStatus = async (req, res) => {
+  try {
+    const { status } = req.body;
+    const allowedStatuses = [
+      "assigned_driver",
+      "in_progress",
+      "picked_up",
+      "completed",
+    ];
+
+    if (!allowedStatuses.includes(status)) {
+      return res.status(400).json({ message: "Invalid status" });
+    }
+
+    const report = await WasteReport.findById(req.params.id);
+
+    if (!report) {
+      return res.status(404).json({ message: "Report not found" });
+    }
+
+    const driverRecord = await Driver.findOne({ userId: req.user._id });
+    const assignedToId = report.assignedTo?.toString();
+    const isAssignedToUser = assignedToId === req.user._id.toString();
+    const isAssignedToDriverRecord = driverRecord
+      ? assignedToId === driverRecord._id.toString()
+      : false;
+    const isAssignedByName = report.assignedDriver?.name === req.user.name;
+    const isAssignedByDriverId = driverRecord
+      ? report.assignedDriver?.id === driverRecord._id.toString()
+      : false;
+
+    if (
+      !isAssignedToUser &&
+      !isAssignedToDriverRecord &&
+      !isAssignedByName &&
+      !isAssignedByDriverId
+    ) {
+      return res.status(403).json({ message: "Access denied" });
+    }
+
+    const statusFlow = [
+      "assigned_driver",
+      "in_progress",
+      "picked_up",
+      "completed",
+    ];
+    const currentIndex = statusFlow.indexOf(report.status);
+    const targetIndex = statusFlow.indexOf(status);
+
+    if (targetIndex !== currentIndex + 1) {
+      return res.status(400).json({ message: "Invalid status transition" });
+    }
+
+    report.status = status;
+
+    if (status === "completed") {
+      report.resolvedAt = new Date();
+    }
+
+    if (report.assignedDriver) {
+      report.assignedDriver.status = status === "completed" ? "available" : "busy";
+    }
+
+    await report.save();
+
+    if (driverRecord) {
+      driverRecord.status = status === "completed" ? "available" : "busy";
+      driverRecord.assignedReportId =
+        status === "completed" ? null : report._id;
+      await driverRecord.save();
+    }
+
+    res.json(report);
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
 // ------------------ CITIZEN ------------------
 
 const getMyReports = async (req, res) => {
@@ -130,7 +233,7 @@ const getSupervisorStats = async (req, res) => {
 const assignDriverToReport = async (req, res) => {
   try {
     const { id: reportId } = req.params;
-    const { driverId } = req.body;
+    const { driverId, estimatedArrival } = req.body;
 
     if (!mongoose.Types.ObjectId.isValid(reportId)) {
       return res.status(400).json({ message: "Invalid report ID" });
@@ -154,25 +257,35 @@ const assignDriverToReport = async (req, res) => {
       return res.status(404).json({ message: "Driver not found" });
     }
 
-    report.status = "assigned";
-    report.assignedTo = driver._id;
+    if (driver.status !== "available") {
+      return res.status(400).json({ message: "Driver is not available" });
+    }
+
+    const locationSnapshot = driver.currentLocation?.address
+      ? driver.currentLocation.address
+      : Array.isArray(driver.location?.coordinates)
+      ? `${driver.location.coordinates[1]}, ${driver.location.coordinates[0]}`
+      : null;
+
+    report.status = "assigned_driver";
+    report.assignedTo = driver.userId || driver._id;
+    report.assignedDriver = {
+      id: driver._id.toString(),
+      name: driver.name,
+      phone: driver.phone || null,
+      plateNumber: driver.vehicle?.plateNumber || driver.plateNumber || null,
+      vehicleType: driver.vehicle?.type || driver.vehicleType || null,
+      estimatedArrival: estimatedArrival || null,
+      currentLocation: locationSnapshot,
+      status: "busy",
+    };
     await report.save();
 
     driver.status = "busy";
     driver.assignedReportId = report._id;
     await driver.save();
 
-    res.json({
-      report,
-      driver: {
-        id: driver._id,
-        name: driver.name,
-        status: driver.status,
-        vehicleType: driver.vehicleType,
-        plateNumber: driver.plateNumber,
-        area: driver.area,
-      },
-    });
+    res.json({ report });
   } catch (error) {
     res.status(500).json({ message: "Server error" });
   }
@@ -258,6 +371,8 @@ const getReportById = async (req, res) => {
 };
 
 module.exports = {
+  getDriverAssignedReports,
+  updateDriverReportStatus,
   createReport,
   getVerifiedReports,
   getMyAssignedReports,

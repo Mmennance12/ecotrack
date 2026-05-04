@@ -43,12 +43,20 @@ import PickupDetails from "./pages/recycler/PickupDetails";
 import RecyclerProfile from "./pages/recycler/Profile";
 
 /* =======================
+  Driver
+======================= */
+import DriverLayout from "./layouts/DriverLayout";
+import DriverDashboard from "./pages/driver/Dashboard";
+import DriverHistory from "./pages/driver/History";
+import DriverProfile from "./pages/driver/Profile";
+
+/* =======================
    🔒 ROLE GUARD (IMPORTANT)
 ======================= */
-function RequireSupervisor({ children }) {
+function ProtectedRoute({ children, role }) {
   const user = JSON.parse(localStorage.getItem("user"));
 
-  if (!user || user.role !== "supervisor") {
+  if (!user || user.role !== role) {
     return <Navigate to="/" />;
   }
 
@@ -97,39 +105,86 @@ function App() {
           <Route path="profile" element={<RecyclerProfile />} />
         </Route>
 
+        <Route
+          path="/recycler-dashboard"
+          element={
+            <ProtectedRoute role="recycler">
+              <RecyclerDashboard />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* =======================
+            Driver Routes
+        ======================= */}
+        <Route
+          path="/driver-dashboard"
+          element={
+            <ProtectedRoute role="driver">
+              <Navigate to="/driver" replace />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/driver"
+          element={
+            <ProtectedRoute role="driver">
+              <DriverLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route index element={<DriverDashboard />} />
+          <Route path="history" element={<DriverHistory />} />
+          <Route path="profile" element={<DriverProfile />} />
+        </Route>
+
+        <Route
+          path="/driver/tasks"
+          element={<Navigate to="/driver" replace />}
+        />
+
         {/* =======================
             🔥 Supervisor (PROTECTED)
         ======================= */}
         <Route
           path="/supervisor/dashboard"
           element={
-            <RequireSupervisor>
+            <ProtectedRoute role="supervisor">
               <SupervisorDashboard />
-            </RequireSupervisor>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin-dashboard"
+          element={
+            <ProtectedRoute role="supervisor">
+              <SupervisorDashboard />
+            </ProtectedRoute>
           }
         />
         <Route
           path="/supervisor/reports"
           element={
-            <RequireSupervisor>
+            <ProtectedRoute role="supervisor">
               <SupervisorReports />
-            </RequireSupervisor>
+            </ProtectedRoute>
           }
         />
         <Route
           path="/supervisor/drivers"
           element={
-            <RequireSupervisor>
+            <ProtectedRoute role="supervisor">
               <SupervisorDrivers />
-            </RequireSupervisor>
+            </ProtectedRoute>
           }
         />
         <Route
           path="/supervisor/reports/:id"
           element={
-            <RequireSupervisor>
+            <ProtectedRoute role="supervisor">
               <ReportDetail />
-            </RequireSupervisor>
+            </ProtectedRoute>
           }
         />
       </Routes>

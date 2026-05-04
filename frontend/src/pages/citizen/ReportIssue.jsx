@@ -1,9 +1,23 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import API from "../../services/apiClient";
+import ThemeToggle from "../../components/ThemeToggle";
 
 function ReportIssue() {
   const navigate = useNavigate();
+
+  const knownLocations = [
+    {
+      name: "queens hostel machakos",
+      latitude: -1.5179,
+      longitude: 37.2638,
+    },
+    {
+      name: "katoloni",
+      latitude: -1.54,
+      longitude: 37.27,
+    },
+  ];
 
   const [formData, setFormData] = useState({
     wasteType: "",
@@ -27,17 +41,35 @@ function ReportIssue() {
   const [geolocationError, setGeolocationError] = useState(null);
   const [geolocationSuccess, setGeolocationSuccess] = useState(null);
 
-  const forwardGeocode = async (locationText) => {
+  const handleLocationSearch = async (locationText) => {
     if (!locationText || locationText.trim().length === 0) {
       setGeolocationError(null);
       setGeolocationSuccess(null);
       return;
     }
 
+    const query = locationText.toLowerCase().trim();
+
     try {
       setGeolocationLoading(true);
       setGeolocationError(null);
       setGeolocationSuccess(null);
+
+      const knownMatch = knownLocations.find((loc) =>
+        query.includes(loc.name)
+      );
+
+      if (knownMatch) {
+        setLocation({
+          latitude: knownMatch.latitude,
+          longitude: knownMatch.longitude,
+          address: knownMatch.name,
+        });
+
+        setGeolocationSuccess("📍 Using known location");
+        setGeolocationError(null);
+        return;
+      }
 
       const response = await fetch(
         `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(locationText)}`
@@ -56,15 +88,15 @@ function ReportIssue() {
           address: address,
         });
 
-        setGeolocationSuccess(address);
+        setGeolocationSuccess(`📍 ${address}`);
         setGeolocationError(null);
       } else {
-        setGeolocationError("Location not found. Please check the name.");
+        setGeolocationError("Location not found");
         setGeolocationSuccess(null);
       }
     } catch (error) {
       console.error("Geocoding error:", error);
-      setGeolocationError("Error searching location. Please try again.");
+      setGeolocationError("Error searching location");
       setGeolocationSuccess(null);
     } finally {
       setGeolocationLoading(false);
@@ -132,11 +164,6 @@ function ReportIssue() {
   function handleChange(e) {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-
-    // If location field changed, geocode it
-    if (name === "location") {
-      forwardGeocode(value);
-    }
   }
 
   function handleFileChange(e) {
@@ -180,7 +207,7 @@ function ReportIssue() {
         JSON.stringify({
           latitude: location.latitude,
           longitude: location.longitude,
-          address: location.address || formData.location,
+          address: location.address,
         })
       );
 
@@ -208,25 +235,25 @@ function ReportIssue() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white">
-      <header className="sticky top-0 z-50 bg-black/90 border-b border-white/10">
+    <div className="min-h-screen bg-slate-50 text-slate-900 transition-colors duration-300 dark:bg-gray-950 dark:text-white">
+      <header className="sticky top-0 z-50 bg-white/80 border-b border-emerald-100 backdrop-blur-md dark:bg-black/90 dark:border-white/10">
         <div className="px-6 md:px-12 lg:px-20 py-4 flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="h-9 w-9 rounded-full bg-green-500/20 text-green-400 flex items-center justify-center text-sm font-semibold">
+            <div className="h-9 w-9 rounded-full bg-green-500/20 text-green-600 dark:text-green-400 flex items-center justify-center text-sm font-semibold">
               E
             </div>
             <div>
-              <p className="text-sm uppercase tracking-widest text-white/60">EcoTrack</p>
-              <p className="text-base font-semibold">Citizen hub</p>
+              <p className="text-sm uppercase tracking-widest text-emerald-700 dark:text-white/60">EcoTrack</p>
+              <p className="text-base font-semibold text-slate-900 dark:text-white">Citizen hub</p>
             </div>
           </div>
 
-          <nav className="flex items-center gap-6 text-sm font-medium text-white/70">
-            <Link to="/dashboard" className="hover:text-white transition">
+          <nav className="flex items-center gap-6 text-sm font-medium text-gray-600 dark:text-white/70">
+            <Link to="/dashboard" className="hover:text-gray-900 transition dark:hover:text-white">
               Dashboard
             </Link>
-            <span className="text-white">Report Waste</span>
-            <Link to="/my-reports" className="hover:text-white transition">
+            <span className="text-gray-900 dark:text-white">Report Waste</span>
+            <Link to="/my-reports" className="hover:text-gray-900 transition dark:hover:text-white">
               My Reports
             </Link>
           </nav>
@@ -235,16 +262,17 @@ function ReportIssue() {
             <input
               type="text"
               placeholder="Search reports..."
-              className="hidden md:block bg-gray-800 text-white text-sm rounded-full px-4 py-2 outline-none"
+              className="hidden md:block bg-white border border-slate-300 text-slate-900 text-sm rounded-full px-4 py-2 outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors duration-300 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
             />
+            <ThemeToggle />
             <button
               type="button"
-              className="h-9 w-9 rounded-full border border-white/10 text-white/70 hover:text-white transition"
+              className="h-9 w-9 rounded-full border border-gray-200 text-gray-500 hover:text-gray-900 transition dark:border-white/10 dark:text-white/70 dark:hover:text-white"
               aria-label="Settings"
             >
               S
             </button>
-            <div className="h-9 w-9 rounded-full bg-gray-800 flex items-center justify-center text-sm font-semibold">
+            <div className="h-9 w-9 rounded-full bg-gray-100 text-gray-700 flex items-center justify-center text-sm font-semibold dark:bg-gray-800 dark:text-white">
               U
             </div>
           </div>
@@ -253,12 +281,12 @@ function ReportIssue() {
 
       <div className="px-6 md:px-12 lg:px-20 py-10">
         <div className="flex items-center gap-4 mb-8">
-          <div className="h-12 w-12 rounded-xl bg-green-500/20 text-green-400 flex items-center justify-center text-xl font-semibold">
+          <div className="h-12 w-12 rounded-xl bg-green-500/20 text-green-600 dark:text-green-400 flex items-center justify-center text-xl font-semibold">
             !
           </div>
           <div>
             <h1 className="text-2xl font-semibold">Report Waste Issue</h1>
-            <p className="text-sm text-gray-400 mt-1">
+            <p className="text-sm text-slate-600 mt-1 dark:text-gray-400">
               Help improve your environment by reporting waste problems
             </p>
           </div>
@@ -268,8 +296,8 @@ function ReportIssue() {
           <div
             className={`mb-6 p-3 rounded-lg text-sm ${
               message.type === "success"
-                ? "bg-green-500/10 text-green-300 border border-green-500/20"
-                : "bg-red-500/10 text-red-300 border border-red-500/20"
+                ? "bg-green-500/10 text-green-700 border border-green-500/20 dark:text-green-300"
+                : "bg-red-500/10 text-red-700 border border-red-500/20 dark:text-red-300"
             }`}
           >
             {message.text}
@@ -280,31 +308,32 @@ function ReportIssue() {
           <div className="lg:col-span-2">
             <form
               onSubmit={handleSubmit}
-              className="bg-gray-900 rounded-2xl p-6 shadow-lg space-y-6"
+              className="bg-white border border-slate-200 rounded-2xl p-6 shadow-[0_10px_40px_rgba(0,0,0,0.04)] space-y-6 dark:bg-gray-900 dark:border-white/10"
             >
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="text-sm text-gray-300">Waste Type *</label>
+                  <label className="text-sm text-gray-600 dark:text-gray-300">Waste Type *</label>
                   <select
                     name="wasteType"
                     value={formData.wasteType}
                     onChange={handleChange}
-                    className="w-full mt-2 px-4 py-2 bg-gray-800 text-white border border-gray-700 rounded-lg focus:ring-2 focus:ring-green-500 outline-none"
+                    className="w-full mt-2 px-4 py-2 bg-white text-slate-900 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-colors duration-300 dark:bg-gray-800 dark:text-white dark:border-gray-700"
                   >
                     <option value="">Select waste type</option>
                     <option value="plastic">Plastic</option>
                     <option value="organic">Organic</option>
                     <option value="metal">Metal</option>
                     <option value="e-waste">E-Waste</option>
+                    <option value="trash">Trash</option>
                   </select>
                 </div>
                 <div>
-                  <label className="text-sm text-gray-300">Urgency *</label>
+                  <label className="text-sm text-gray-600 dark:text-gray-300">Urgency *</label>
                   <select
                     name="urgency"
                     value={formData.urgency}
                     onChange={handleChange}
-                    className="w-full mt-2 px-4 py-2 bg-gray-800 text-white border border-gray-700 rounded-lg focus:ring-2 focus:ring-green-500 outline-none"
+                    className="w-full mt-2 px-4 py-2 bg-white text-slate-900 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-colors duration-300 dark:bg-gray-800 dark:text-white dark:border-gray-700"
                   >
                     <option value="">Select urgency</option>
                     <option value="low">Low</option>
@@ -315,45 +344,46 @@ function ReportIssue() {
               </div>
 
               <div>
-                <label className="text-sm text-gray-300">Description *</label>
+                <label className="text-sm text-gray-600 dark:text-gray-300">Description *</label>
                 <textarea
                   name="description"
                   placeholder="Describe the waste problem, quantity, and any hazards..."
                   value={formData.description}
                   onChange={handleChange}
-                  className="w-full mt-2 h-28 px-4 py-3 bg-gray-800 text-white border border-gray-700 rounded-lg focus:ring-2 focus:ring-green-500 outline-none"
+                  className="w-full mt-2 h-28 px-4 py-3 bg-white text-slate-900 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-colors duration-300 dark:bg-gray-800 dark:text-white dark:border-gray-700"
                 />
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="text-sm text-gray-300">Location *</label>
+                  <label className="text-sm text-gray-600 dark:text-gray-300">Location *</label>
                   <input
                     type="text"
                     name="location"
                     placeholder="e.g. Machakos University, Nairobi..."
                     value={formData.location}
                     onChange={handleChange}
-                    className="w-full mt-2 px-4 py-2 bg-gray-800 text-white border border-gray-700 rounded-lg focus:ring-2 focus:ring-green-500 outline-none"
+                    onBlur={(event) => handleLocationSearch(event.target.value)}
+                    className="w-full mt-2 px-4 py-2 bg-white text-slate-900 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-colors duration-300 dark:bg-gray-800 dark:text-white dark:border-gray-700"
                   />
                   
                   {/* Geocoding feedback */}
                   <div className="mt-2 text-sm">
                     {geolocationLoading && (
-                      <p className="text-blue-400">🔍 Searching location...</p>
+                      <p className="text-blue-600 dark:text-blue-400">🔍 Searching location...</p>
                     )}
                     {geolocationSuccess && !geolocationLoading && (
-                      <p className="text-green-400">📍 {geolocationSuccess}</p>
+                      <p className="text-green-600 dark:text-green-400">📍 {geolocationSuccess}</p>
                     )}
                     {geolocationError && (
-                      <p className="text-red-400">{geolocationError}</p>
+                      <p className="text-red-600 dark:text-red-400">{geolocationError}</p>
                     )}
                   </div>
                 </div>
-                <div className="bg-gray-800 rounded-lg p-3 flex items-center justify-between mt-6 md:mt-7">
+                <div className="bg-emerald-50 rounded-lg p-3 flex items-center justify-between mt-6 md:mt-7 dark:bg-gray-800">
                   <div>
-                    <p className="text-xs text-gray-400">Detected Location</p>
-                    <p className="text-sm text-white">
+                    <p className="text-xs text-emerald-700 dark:text-gray-400">Detected Location</p>
+                    <p className="text-sm text-emerald-800 dark:text-white">
                       {locationLoading
                         ? "Detecting location..."
                         : location.address || "Unknown location"}
@@ -362,17 +392,17 @@ function ReportIssue() {
                   <button
                     type="button"
                     onClick={() => window.location.reload()}
-                    className="text-green-400 text-sm"
+                    className="text-green-600 text-sm dark:text-green-400"
                   >
                     Refresh Location
                   </button>
                 </div>
               </div>
 
-              <div className="text-xs text-gray-400">
+              <div className="text-xs text-gray-500 dark:text-gray-400">
                 {locationError ? locationError : "Location ready"}
-                {location.latitude && location.longitude && (
-                  <span className="ml-2 text-white/60">
+                {!geolocationError && location.latitude && location.longitude && (
+                  <span className="ml-2 text-gray-500 dark:text-white/60">
                     Lat: {location.latitude} | Lng: {location.longitude}
                   </span>
                 )}
@@ -380,9 +410,9 @@ function ReportIssue() {
 
               <div>
                 {!preview ? (
-                  <label className="border-2 border-dashed border-gray-700 rounded-xl p-6 text-center bg-gray-800 cursor-pointer block">
-                    <p className="text-sm text-white">Click to upload or drag & drop</p>
-                    <p className="text-xs text-gray-400 mt-1">PNG, JPG up to 10MB</p>
+                  <label className="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center bg-gray-50 cursor-pointer block transition-colors duration-300 dark:border-gray-700 dark:bg-gray-800">
+                    <p className="text-sm text-gray-900 dark:text-white">Click to upload or drag & drop</p>
+                    <p className="text-xs text-gray-500 mt-1 dark:text-gray-400">PNG, JPG up to 10MB</p>
                     <input
                       type="file"
                       accept="image/*"
@@ -411,7 +441,7 @@ function ReportIssue() {
               <button
                 type="submit"
                 disabled={loading || locationLoading || !location.latitude}
-                className="w-full bg-green-500 text-white py-3 rounded-xl font-semibold hover:bg-green-600 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full bg-emerald-600 text-white py-3 rounded-xl font-semibold hover:bg-emerald-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? "Submitting..." : "Submit Report"}
               </button>
@@ -419,7 +449,7 @@ function ReportIssue() {
           </div>
 
           <div className="space-y-6">
-            <div className="bg-gray-900 rounded-2xl p-6 space-y-4">
+            <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6 space-y-4 dark:bg-gray-900 dark:border-white/10">
               <h3 className="text-lg font-semibold">How it works</h3>
               {[
                 {
@@ -440,14 +470,14 @@ function ReportIssue() {
                 },
               ].map((step, index) => (
                 <div key={step.title} className="flex gap-3">
-                  <div className="h-8 w-8 rounded-full bg-green-500/20 text-green-400 flex items-center justify-center text-xs font-semibold">
+                  <div className="h-8 w-8 rounded-full bg-green-500/20 text-green-600 dark:text-green-400 flex items-center justify-center text-xs font-semibold">
                     {index + 1}
                   </div>
                   <div>
-                    <p className="text-sm font-semibold text-white">
+                    <p className="text-sm font-semibold text-gray-900 dark:text-white">
                       {step.title}
                     </p>
-                    <p className="text-xs text-gray-400 mt-1">
+                    <p className="text-xs text-gray-600 mt-1 dark:text-gray-400">
                       {step.description}
                     </p>
                   </div>
@@ -455,9 +485,9 @@ function ReportIssue() {
               ))}
             </div>
 
-            <div className="bg-gray-900 rounded-2xl p-6 space-y-3">
+            <div className="bg-white border border-slate-200 rounded-2xl p-6 space-y-3 dark:bg-gray-900 dark:border-white/10">
               <h3 className="text-lg font-semibold">Quick Tips</h3>
-              <ul className="text-sm text-gray-400 space-y-2">
+              <ul className="text-sm text-gray-600 space-y-2 dark:text-gray-400">
                 <li>Take a clear photo</li>
                 <li>Include exact location</li>
                 <li>Describe type and size</li>

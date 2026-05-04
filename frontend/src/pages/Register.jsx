@@ -49,7 +49,7 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen relative flex items-center justify-center">
+    <div className="min-h-screen relative flex items-center justify-center bg-slate-50 text-slate-900 dark:bg-gray-950 dark:text-white">
 
       {/* Background */}
       <div
@@ -66,24 +66,24 @@ const Register = () => {
       {/* Card */}
       <div className="relative z-10 w-full max-w-md px-6">
 
-        <div className="bg-white/90 backdrop-blur-xl shadow-2xl rounded-3xl p-10">
+        <div className="bg-white/90 text-slate-900 backdrop-blur-xl shadow-2xl rounded-3xl p-10 dark:bg-gray-900/90 dark:text-white">
 
           {/* Branding */}
           <div className="text-center mb-6">
             <h1 className="text-2xl font-bold text-green-600">EcoTrack</h1>
-            <p className="text-gray-500 text-sm mt-1">
+            <p className="text-slate-500 text-sm mt-1 dark:text-gray-300">
               Create your account
             </p>
           </div>
 
           {/* Title */}
-          <h2 className="text-2xl font-semibold text-center mb-6 text-gray-800">
+          <h2 className="text-2xl font-semibold text-center mb-6 text-slate-900 dark:text-white">
             Sign Up
           </h2>
 
           {/* ERROR */}
           {error && (
-            <div className="mb-4 text-sm text-red-600 bg-red-100 px-4 py-2 rounded-lg">
+            <div className="mb-4 text-sm text-red-700 bg-red-100 px-4 py-2 rounded-lg dark:text-red-300 dark:bg-red-500/10">
               {error}
             </div>
           )}
@@ -91,12 +91,12 @@ const Register = () => {
           <form onSubmit={handleSubmit} className="space-y-5">
 
             {/* Name */}
-            <div className="flex items-center bg-gray-50 border border-gray-200 rounded-xl px-3 focus-within:ring-2 focus-within:ring-green-500">
-              <FaUser className="text-gray-400 mr-2" />
+            <div className="flex items-center bg-white border border-slate-300 rounded-xl px-3 focus-within:ring-2 focus-within:ring-emerald-500 focus-within:border-emerald-500 dark:bg-gray-800 dark:border-gray-700">
+              <FaUser className="text-slate-400 mr-2 dark:text-gray-400" />
               <input
                 type="text"
                 placeholder="Full Name"
-                className="w-full py-3 bg-transparent outline-none"
+                className="w-full py-3 bg-transparent outline-none text-slate-900 placeholder-slate-400 dark:text-white dark:placeholder-gray-400"
                 value={name}
                 onChange={(e)=>setName(e.target.value)}
                 required
@@ -104,12 +104,12 @@ const Register = () => {
             </div>
 
             {/* Email */}
-            <div className="flex items-center bg-gray-50 border border-gray-200 rounded-xl px-3 focus-within:ring-2 focus-within:ring-green-500">
-              <FaEnvelope className="text-gray-400 mr-2" />
+            <div className="flex items-center bg-white border border-slate-300 rounded-xl px-3 focus-within:ring-2 focus-within:ring-emerald-500 focus-within:border-emerald-500 dark:bg-gray-800 dark:border-gray-700">
+              <FaEnvelope className="text-slate-400 mr-2 dark:text-gray-400" />
               <input
                 type="email"
                 placeholder="Email address"
-                className="w-full py-3 bg-transparent outline-none"
+                className="w-full py-3 bg-transparent outline-none text-slate-900 placeholder-slate-400 dark:text-white dark:placeholder-gray-400"
                 value={email}
                 onChange={(e)=>setEmail(e.target.value)}
                 required
@@ -117,24 +117,24 @@ const Register = () => {
             </div>
 
             {/* Phone */}
-            <div className="flex items-center bg-gray-50 border border-gray-200 rounded-xl px-3 focus-within:ring-2 focus-within:ring-green-500">
-              <FaPhone className="text-gray-400 mr-2" />
+            <div className="flex items-center bg-white border border-slate-300 rounded-xl px-3 focus-within:ring-2 focus-within:ring-emerald-500 focus-within:border-emerald-500 dark:bg-gray-800 dark:border-gray-700">
+              <FaPhone className="text-slate-400 mr-2 dark:text-gray-400" />
               <input
                 type="text"
                 placeholder="Phone number"
-                className="w-full py-3 bg-transparent outline-none"
+                className="w-full py-3 bg-transparent outline-none text-slate-900 placeholder-slate-400 dark:text-white dark:placeholder-gray-400"
                 value={phone}
                 onChange={(e)=>setPhone(e.target.value)}
               />
             </div>
 
             {/* Password */}
-            <div className="flex items-center bg-gray-50 border border-gray-200 rounded-xl px-3 focus-within:ring-2 focus-within:ring-green-500">
-              <FaLock className="text-gray-400 mr-2" />
+            <div className="flex items-center bg-white border border-slate-300 rounded-xl px-3 focus-within:ring-2 focus-within:ring-emerald-500 focus-within:border-emerald-500 dark:bg-gray-800 dark:border-gray-700">
+              <FaLock className="text-slate-400 mr-2 dark:text-gray-400" />
               <input
                 type="password"
                 placeholder="Password"
-                className="w-full py-3 bg-transparent outline-none"
+                className="w-full py-3 bg-transparent outline-none text-slate-900 placeholder-slate-400 dark:text-white dark:placeholder-gray-400"
                 value={password}
                 onChange={(e)=>setPassword(e.target.value)}
                 required
@@ -142,12 +142,12 @@ const Register = () => {
             </div>
 
             {/* Confirm Password */}
-            <div className="flex items-center bg-gray-50 border border-gray-200 rounded-xl px-3 focus-within:ring-2 focus-within:ring-green-500">
-              <FaLock className="text-gray-400 mr-2" />
+            <div className="flex items-center bg-white border border-slate-300 rounded-xl px-3 focus-within:ring-2 focus-within:ring-emerald-500 focus-within:border-emerald-500 dark:bg-gray-800 dark:border-gray-700">
+              <FaLock className="text-slate-400 mr-2 dark:text-gray-400" />
               <input
                 type="password"
                 placeholder="Confirm password"
-                className="w-full py-3 bg-transparent outline-none"
+                className="w-full py-3 bg-transparent outline-none text-slate-900 placeholder-slate-400 dark:text-white dark:placeholder-gray-400"
                 value={confirmPassword}
                 onChange={(e)=>setConfirmPassword(e.target.value)}
                 required
@@ -155,14 +155,15 @@ const Register = () => {
             </div>
 
             {/* Role */}
-            <div className="bg-gray-50 border border-gray-200 rounded-xl px-3 focus-within:ring-2 focus-within:ring-green-500">
+            <div className="bg-white border border-slate-300 rounded-xl px-3 focus-within:ring-2 focus-within:ring-emerald-500 focus-within:border-emerald-500 dark:bg-gray-800 dark:border-gray-700">
               <select
-                className="w-full py-3 bg-transparent outline-none"
+                className="w-full py-3 bg-transparent outline-none text-slate-900 dark:text-white"
                 value={role}
                 onChange={(e) => setRole(e.target.value)}
               >
                 <option value="citizen">Register as Citizen</option>
                 <option value="recycler">Register as Recycler</option>
+                <option value="driver">Register as Driver</option>
               </select>
             </div>
 
@@ -173,7 +174,7 @@ const Register = () => {
               className={`w-full py-3 rounded-xl font-semibold transition ${
                 loading
                   ? "bg-gray-400 cursor-not-allowed"
-                  : "bg-green-600 text-white hover:bg-green-700 shadow-md hover:shadow-lg"
+                  : "bg-emerald-600 text-white hover:bg-emerald-700 shadow-md hover:shadow-lg"
               }`}
             >
               {loading ? "Creating account..." : "Register"}
@@ -183,23 +184,23 @@ const Register = () => {
 
           {/* Divider */}
           <div className="my-6 flex items-center">
-            <div className="flex-grow border-t border-gray-200"></div>
-            <span className="mx-3 text-gray-400 text-sm">OR</span>
-            <div className="flex-grow border-t border-gray-200"></div>
+            <div className="flex-grow border-t border-slate-200 dark:border-gray-700"></div>
+            <span className="mx-3 text-slate-400 text-sm dark:text-gray-400">OR</span>
+            <div className="flex-grow border-t border-slate-200 dark:border-gray-700"></div>
           </div>
 
           {/* Google */}
-          <button className="w-full flex items-center justify-center gap-2 border border-gray-200 py-3 rounded-xl hover:bg-gray-50 transition">
+          <button className="w-full flex items-center justify-center gap-2 border border-slate-200 py-3 rounded-xl hover:bg-slate-50 transition dark:border-gray-700 dark:hover:bg-gray-800/60">
             <FcGoogle size={20}/>
             Continue with Google
           </button>
 
           {/* Login */}
-          <p className="text-center text-sm text-gray-500 mt-6">
+          <p className="text-center text-sm text-slate-500 mt-6 dark:text-gray-400">
             Already have an account?{" "}
             <Link
               to="/login"
-              className="text-green-600 hover:underline font-medium"
+              className="text-emerald-600 hover:underline font-medium"
             >
               Login
             </Link>

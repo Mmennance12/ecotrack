@@ -4,10 +4,10 @@ function SupervisorSidebar() {
   const location = useLocation();
   const isActive = (path) => location.pathname === path;
   const navItem =
-    "px-4 py-2 rounded-lg text-gray-600 hover:bg-green-100 hover:text-green-600 transition block";
+    "px-4 py-2 rounded-lg text-gray-700 hover:bg-emerald-100 hover:text-emerald-700 transition block";
 
   return (
-    <aside className="w-64 h-screen bg-white border-r p-4 flex flex-col">
+    <aside className="w-64 h-screen bg-[#B9F6CA] border-r border-emerald-100 p-4 flex flex-col">
       <div className="mb-8">
         <h1 className="text-lg font-bold text-gray-800">EcoTrack</h1>
         <p className="text-sm text-gray-500">Supervisor</p>
@@ -18,7 +18,7 @@ function SupervisorSidebar() {
           to="/supervisor/dashboard"
           className={
             isActive("/supervisor/dashboard")
-              ? "bg-green-100 text-green-600 font-semibold " + navItem
+              ? "bg-white/80 text-emerald-800 font-semibold " + navItem
               : navItem
           }
         >
@@ -28,7 +28,7 @@ function SupervisorSidebar() {
           to="/supervisor/reports"
           className={
             isActive("/supervisor/reports")
-              ? "bg-green-100 text-green-600 font-semibold " + navItem
+              ? "bg-white/80 text-emerald-800 font-semibold " + navItem
               : navItem
           }
         >
@@ -38,7 +38,7 @@ function SupervisorSidebar() {
           to="/supervisor/drivers"
           className={
             isActive("/supervisor/drivers")
-              ? "bg-green-100 text-green-600 font-semibold " + navItem
+              ? "bg-white/80 text-emerald-800 font-semibold " + navItem
               : navItem
           }
         >
@@ -46,9 +46,9 @@ function SupervisorSidebar() {
         </Link>
       </nav>
 
-      <div className="mt-auto pt-6 border-t border-gray-200">
+      <div className="mt-auto pt-6 border-t border-emerald-200">
         <div className="flex items-center gap-3">
-          <div className="h-10 w-10 rounded-full bg-green-500 text-white flex items-center justify-center font-semibold">
+          <div className="h-10 w-10 rounded-full bg-[#2E7D32] text-white flex items-center justify-center font-semibold">
             A
           </div>
           <div>

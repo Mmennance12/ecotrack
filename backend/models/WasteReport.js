@@ -61,6 +61,10 @@ const wasteReportSchema = new mongoose.Schema(
       type: String,
       enum: [
         "pending",
+        "assigned_driver",
+        "picked_up",
+        "recycler_claimed",
+        "completed",
         "verified",
         "assigned",
         "in_progress",
@@ -68,6 +72,17 @@ const wasteReportSchema = new mongoose.Schema(
         "rejected",
       ],
       default: "pending",
+    },
+
+    assignedDriver: {
+      id: { type: String },
+      name: { type: String },
+      phone: { type: String },
+      plateNumber: { type: String },
+      vehicleType: { type: String },
+      estimatedArrival: { type: String },
+      currentLocation: { type: String },
+      status: { type: String, enum: ["available", "busy"] },
     },
 
     // 🔥 NEW: Admin-level archival control

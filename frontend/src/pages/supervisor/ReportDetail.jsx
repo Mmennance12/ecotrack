@@ -72,37 +72,16 @@ function ReportDetail() {
     }
   };
 
-  // Haversine formula for distance calculation
-  const getDistance = (lat1, lon1, lat2, lon2) => {
-    const R = 6371; // Earth's radius in km
-    const toRad = (x) => (x * Math.PI) / 180;
-
-    const dLat = toRad(lat2 - lat1);
-    const dLon = toRad(lon2 - lon1);
-
-    const a =
-      Math.sin(dLat / 2) ** 2 +
-      Math.cos(toRad(lat1)) *
-        Math.cos(toRad(lat2)) *
-        Math.sin(dLon / 2) ** 2;
-
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-
-    return R * c;
-  };
-
   const handleAssignDriver = async (driverId) => {
     try {
       setActionLoading(true);
 
-      // Step 1: If report is pending, verify it first
       if (report.status === "pending") {
         await API.put(`/reports/${id}/status`, {
           status: "verified",
         });
       }
 
-      // Step 2: Assign the driver
       await API.patch(`/reports/${id}/assign-driver`, {
         driverId,
       });
@@ -151,9 +130,19 @@ function ReportDetail() {
     const statusLower = (status || "").toLowerCase();
     if (statusLower === "pending") return "bg-gray-200 text-gray-700";
     if (statusLower === "verified") return "bg-purple-100 text-purple-700";
-    if (statusLower === "assigned") return "bg-blue-100 text-blue-700";
+    if (statusLower === "assigned" || statusLower === "assigned_driver") {
+      return "bg-blue-100 text-blue-700";
+    }
+    if (statusLower === "picked_up" || statusLower === "in_progress") {
+      return "bg-amber-100 text-amber-700";
+    }
+    if (statusLower === "recycler_claimed") {
+      return "bg-emerald-100 text-emerald-700";
+    }
+    if (statusLower === "completed" || statusLower === "resolved") {
+      return "bg-green-100 text-green-700";
+    }
     if (statusLower === "rejected") return "bg-red-100 text-red-700";
-    if (statusLower === "resolved") return "bg-green-100 text-green-700";
     return "bg-gray-100 text-gray-700";
   };
 
@@ -191,7 +180,6 @@ function ReportDetail() {
         </header>
 
         <main className="px-6 py-6">
-          {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 mb-6">
             <button
               disabled={actionLoading || report.status === "verified"}
@@ -202,7 +190,7 @@ function ReportDetail() {
             </button>
 
             <button
-              disabled={actionLoading || report.status === "assigned"}
+              disabled={actionLoading || report.status === "assigned_driver"}
               onClick={() => setShowDriverModal(true)}
               className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white py-3 rounded-lg font-semibold transition flex items-center justify-center gap-2"
             >
@@ -218,9 +206,7 @@ function ReportDetail() {
             </button>
           </div>
 
-          {/* Main Content Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* LEFT: Details */}
             <div className="lg:col-span-2 bg-white p-6 rounded-xl shadow-sm">
               <h2 className="text-lg font-semibold text-gray-800 mb-4">
                 Details
@@ -266,12 +252,10 @@ function ReportDetail() {
                     Report ID: {report._id}
                   </p>
                   <p className="text-xs text-gray-400 mt-1">
-                    Created:{" "}
-                    {new Date(report.createdAt).toLocaleString()}
+                    Created: {new Date(report.createdAt).toLocaleString()}
                   </p>
                 </div>
 
-                {/* Comment Input */}
                 {report.status === "pending" && (
                   <div className="border-t pt-4">
                     <label className="block text-sm font-semibold text-gray-800 mb-2">
@@ -289,9 +273,7 @@ function ReportDetail() {
               </div>
             </div>
 
-            {/* RIGHT: Image + History */}
             <div className="space-y-6">
-              {/* Image */}
               {report.images && report.images.length > 0 ? (
                 <div className="bg-white p-4 rounded-xl shadow-sm">
                   <h3 className="font-semibold text-gray-800 mb-3">Image</h3>
@@ -310,7 +292,6 @@ function ReportDetail() {
                 </div>
               )}
 
-              {/* History */}
               <div className="bg-white p-4 rounded-xl shadow-sm">
                 <h3 className="font-semibold text-gray-800 mb-4">History</h3>
                 <div className="space-y-3 text-sm text-gray-600">
@@ -324,7 +305,7 @@ function ReportDetail() {
                       <span>Report verified</span>
                     </div>
                   )}
-                  {report.status === "assigned" && (
+                  {report.status === "assigned_driver" && (
                     <div className="flex items-center gap-2">
                       <span className="text-lg">🚛</span>
                       <span>Driver assigned</span>
@@ -349,7 +330,6 @@ function ReportDetail() {
         </main>
       </div>
 
-      {/* Driver Selection Modal */}
       {showDriverModal && (
         <DriverSelectModal
           reportLocation={report?.location}

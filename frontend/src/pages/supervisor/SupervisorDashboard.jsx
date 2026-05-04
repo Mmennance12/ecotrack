@@ -75,18 +75,22 @@ function SupervisorDashboard() {
       case "verified":
         return "bg-yellow-100 text-yellow-700 px-2 py-1 rounded-full";
       case "assigned":
-        return "bg-blue-100 text-blue-700 px-2 py-1 rounded-full";
+        return "bg-[#FF8A80] text-[#8E0E0E] px-2 py-1 rounded-full";
+      case "in_progress":
+        return "bg-[#FF8A80] text-[#8E0E0E] px-2 py-1 rounded-full";
+      case "assigned_driver":
+        return "bg-[#FFCCBC] text-[#A84300] px-2 py-1 rounded-full";
       case "rejected":
         return "bg-red-100 text-red-600 px-2 py-1 rounded-full";
       case "resolved":
-        return "bg-green-100 text-green-700 px-2 py-1 rounded-full";
+        return "bg-[#1B5E20] text-white px-2 py-1 rounded-full";
       default:
         return "bg-gray-100 text-gray-600 px-2 py-1 rounded-full";
     }
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex">
+    <div className="min-h-screen bg-[#FAF9F6] flex">
       <SupervisorSidebar />
 
       <div className="flex-1 min-w-0">
@@ -108,8 +112,8 @@ function SupervisorDashboard() {
             >
               🔔
             </button>
-            <div className="flex items-center gap-2 bg-gray-100 px-3 py-2 rounded-full">
-              <div className="h-8 w-8 rounded-full bg-green-500 text-white flex items-center justify-center text-sm font-semibold">
+            <div className="flex items-center gap-2 bg-emerald-50 px-3 py-2 rounded-full">
+              <div className="h-8 w-8 rounded-full bg-[#2E7D32] text-white flex items-center justify-center text-sm font-semibold">
                 A
               </div>
               <div className="text-sm">
@@ -122,10 +126,10 @@ function SupervisorDashboard() {
 
         <main className="px-6 py-6">
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
-            <StatCard title="Total Reports" value={stats.total} tone="green" />
-            <StatCard title="Pending Pickups" value={stats.pending} tone="yellow" />
-            <StatCard title="Resolved Issues" value={stats.resolved} tone="emerald" />
-            <StatCard title="Active Drivers" value={drivers.length} tone="blue" />
+            <StatCard title="Total Reports" value={stats.total} tone="lavender" />
+            <StatCard title="Pending Pickups" value={stats.pending} tone="peach" />
+            <StatCard title="Resolved Issues" value={stats.resolved} tone="mint" />
+            <StatCard title="Active Drivers" value={drivers.length} tone="sky" />
           </div>
 
           <div className="grid grid-cols-1 xl:grid-cols-10 gap-6 mt-6">
@@ -176,7 +180,7 @@ function SupervisorDashboard() {
                         <div className="col-span-2">
                           <Link
                             to={`/supervisor/reports/${report._id}`}
-                            className="text-green-600 font-semibold hover:underline"
+                            className="text-[#2E7D32] font-semibold hover:underline"
                           >
                             View
                           </Link>
@@ -205,6 +209,11 @@ function SupervisorDashboard() {
 
 function CategoryBars({ data }) {
   const maxValue = Math.max(1, ...data.map((item) => item.value || 0));
+  const barStyles = {
+    "Illegal Dumping": "bg-[#C7B6FF]",
+    Plastic: "bg-[#FFC69E]",
+    "E-Waste": "bg-[#B8D5FF]",
+  };
 
   return (
     <div className="space-y-4">
@@ -219,7 +228,7 @@ function CategoryBars({ data }) {
             </div>
             <div className="h-3 w-full rounded-full bg-gray-100 overflow-hidden">
               <div
-                className="h-full rounded-full bg-green-500"
+                className={`h-full rounded-full ${barStyles[item.name] || "bg-emerald-300"}`}
                 style={{ width: `${percentage}%` }}
               />
             </div>
@@ -232,21 +241,21 @@ function CategoryBars({ data }) {
 
 function StatCard({ title, value, tone }) {
   const toneStyles = {
-    green: "bg-green-100 text-green-600",
-    yellow: "bg-yellow-100 text-yellow-600",
-    emerald: "bg-emerald-100 text-emerald-600",
-    blue: "bg-blue-100 text-blue-600",
+    lavender: "bg-[#E9E2FF] text-[#5E35B1]",
+    peach: "bg-[#FFE4CF] text-[#C65D00]",
+    mint: "bg-[#DFF6E9] text-[#1B5E20]",
+    sky: "bg-[#DCEBFF] text-[#1565C0]",
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-sm p-4 flex items-center justify-between">
-      <div>
-        <p className="text-sm text-gray-500">{title}</p>
-        <p className="text-2xl font-semibold text-gray-800 mt-2">{value}</p>
+    <div className={`rounded-xl shadow-sm p-4 flex items-center justify-between ${toneStyles[tone]}`}>
+      <div className="bg-white/80 rounded-xl px-3 py-2">
+        <p className="text-sm text-gray-600">{title}</p>
+        <p className="text-2xl font-semibold text-gray-900 mt-1">{value}</p>
         <p className="text-xs text-gray-400 mt-1">Updated just now</p>
       </div>
-      <div className={`h-10 w-10 rounded-full flex items-center justify-center ${toneStyles[tone]}`}>
-        ●
+      <div className="h-10 w-10 rounded-full bg-white/80 flex items-center justify-center">
+        <span className="text-lg">●</span>
       </div>
     </div>
   );

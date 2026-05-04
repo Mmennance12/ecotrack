@@ -16,6 +16,8 @@ const {
   getReportById,
   updateReportStatus, // ✅ NEW (IMPORTANT)
   assignDriverToReport,
+  getDriverAssignedReports,
+  updateDriverReportStatus,
 } = require("../controllers/reportController");
 
 const { protect, authorize } = require("../middleware/authMiddleware");
@@ -133,6 +135,28 @@ router.put(
   protect,
   authorize("recycler"),
   resolveReport
+);
+
+//
+// ======================
+// 🚚 DRIVER ROUTES
+// ======================
+//
+
+// Driver assigned reports
+router.get(
+  "/driver/assigned",
+  protect,
+  authorize("driver"),
+  getDriverAssignedReports
+);
+
+// Driver status update
+router.patch(
+  "/driver/:id/status",
+  protect,
+  authorize("driver"),
+  updateDriverReportStatus
 );
 
 //

@@ -98,6 +98,7 @@ function DriverSelectModal({ reportLocation, onAssign, onClose, isLoading }) {
       (driver) =>
         driver.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         driver.phone?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        driver.vehicle?.plateNumber?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         driver.plateNumber?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         driver.area?.toLowerCase().includes(searchTerm.toLowerCase())
     );
@@ -167,7 +168,7 @@ function DriverSelectModal({ reportLocation, onAssign, onClose, isLoading }) {
                           {driver.name}
                         </h3>
                         <p className="text-sm text-gray-600 truncate">
-                          {driver.vehicleType} • {driver.plateNumber}
+                          {(driver.vehicle?.type || driver.vehicleType || "Vehicle")} • {driver.vehicle?.plateNumber || driver.plateNumber || "N/A"}
                         </p>
                         {driver.phone && (
                           <p className="text-xs text-gray-500 truncate">

@@ -31,14 +31,17 @@ const Login = () => {
       localStorage.setItem("user", JSON.stringify(data.user));
 
       switch (data.user.role) {
+        case "driver":
+          navigate("/driver-dashboard");
+          break;
         case "citizen":
           navigate("/dashboard");
           break;
         case "recycler":
-          navigate("/recycler/dashboard");
+          navigate("/recycler-dashboard");
           break;
         case "supervisor":
-          navigate("/supervisor/dashboard");
+          navigate("/admin-dashboard");
           break;
         default:
           navigate("/dashboard");
@@ -52,7 +55,7 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen relative flex items-center justify-center">
+    <div className="min-h-screen relative flex items-center justify-center bg-slate-50 text-slate-900 dark:bg-gray-950 dark:text-white">
 
       {/* Background */}
       <div
@@ -69,24 +72,24 @@ const Login = () => {
       {/* Card */}
       <div className="relative z-10 w-full max-w-md px-6">
 
-        <div className="bg-white/90 backdrop-blur-xl shadow-2xl rounded-3xl p-10">
+        <div className="bg-white/90 text-slate-900 backdrop-blur-xl shadow-2xl rounded-3xl p-10 dark:bg-gray-900/90 dark:text-white">
 
           {/* Branding */}
           <div className="text-center mb-6">
             <h1 className="text-2xl font-bold text-green-600">EcoTrack</h1>
-            <p className="text-gray-500 text-sm mt-1">
+            <p className="text-slate-500 text-sm mt-1 dark:text-gray-300">
               Smarter waste reporting system
             </p>
           </div>
 
           {/* Title */}
-          <h2 className="text-2xl font-semibold text-center mb-6 text-gray-800">
+          <h2 className="text-2xl font-semibold text-center mb-6 text-slate-900 dark:text-white">
             Welcome Back
           </h2>
 
           {/* ERROR MESSAGE */}
           {error && (
-            <div className="mb-4 text-sm text-red-600 bg-red-100 px-4 py-2 rounded-lg">
+            <div className="mb-4 text-sm text-red-700 bg-red-100 px-4 py-2 rounded-lg dark:text-red-300 dark:bg-red-500/10">
               {error}
             </div>
           )}
@@ -97,7 +100,7 @@ const Login = () => {
             <input
               type="email"
               placeholder="Email address"
-              className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:bg-white transition"
+              className="w-full px-4 py-3 bg-white border border-slate-300 text-slate-900 placeholder-slate-400 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:placeholder-gray-400"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -108,7 +111,7 @@ const Login = () => {
               <input
                 type={showPassword ? "text" : "password"}
                 placeholder="Password"
-                className="w-full px-4 py-3 pr-12 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:bg-white transition"
+                className="w-full px-4 py-3 pr-12 bg-white border border-slate-300 text-slate-900 placeholder-slate-400 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:placeholder-gray-400"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
@@ -117,7 +120,7 @@ const Login = () => {
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-3 text-gray-500 hover:text-gray-700"
+                className="absolute right-3 top-3 text-slate-500 hover:text-slate-700 dark:text-gray-300 dark:hover:text-white"
               >
                 {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
               </button>
@@ -130,7 +133,7 @@ const Login = () => {
               className={`w-full py-3 rounded-xl font-semibold shadow-md transition ${
                 loading
                   ? "bg-gray-400 cursor-not-allowed"
-                  : "bg-green-600 text-white hover:bg-green-700 hover:shadow-lg"
+                  : "bg-emerald-600 text-white hover:bg-emerald-700 hover:shadow-lg"
               }`}
             >
               {loading ? "Logging in..." : "Login"}
@@ -140,23 +143,23 @@ const Login = () => {
 
           {/* Divider */}
           <div className="my-6 flex items-center">
-            <div className="flex-grow border-t border-gray-200"></div>
-            <span className="mx-4 text-gray-400 text-sm">OR</span>
-            <div className="flex-grow border-t border-gray-200"></div>
+            <div className="flex-grow border-t border-slate-200 dark:border-gray-700"></div>
+            <span className="mx-4 text-slate-400 text-sm dark:text-gray-400">OR</span>
+            <div className="flex-grow border-t border-slate-200 dark:border-gray-700"></div>
           </div>
 
           {/* Google */}
-          <button className="w-full flex items-center justify-center gap-2 border border-gray-200 py-3 rounded-xl hover:bg-gray-50 transition">
+          <button className="w-full flex items-center justify-center gap-2 border border-slate-200 py-3 rounded-xl hover:bg-slate-50 transition dark:border-gray-700 dark:hover:bg-gray-800/60">
             <FcGoogle size={20} />
             Continue with Google
           </button>
 
           {/* Register */}
-          <p className="text-center text-sm text-gray-500 mt-6">
+          <p className="text-center text-sm text-slate-500 mt-6 dark:text-gray-400">
             Don’t have an account?{" "}
             <Link
               to="/register"
-              className="text-green-600 font-medium hover:underline"
+              className="text-emerald-600 font-medium hover:underline"
             >
               Register
             </Link>

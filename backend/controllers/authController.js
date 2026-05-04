@@ -1,5 +1,6 @@
 const User = require("../models/User");
 const WasteReport = require("../models/WasteReport");
+const Driver = require("../models/Driver");
 const jwt = require("jsonwebtoken");
 const mongoose = require("mongoose");
 
@@ -35,18 +36,35 @@ const register = async (req, res) => {
       });
     }
 
-    let assignedRole = "citizen";
-
-    if (role === "recycler") {
-      assignedRole = "recycler";
-    }
+    const allowedRoles = ["citizen", "recycler", "supervisor", "driver"];
+    const assignedRole = allowedRoles.includes(role) ? role : "citizen";
 
     const user = await User.create({
       name,
       email,
       password,
-      role: "citizen",
+      role: assignedRole,
     });
+
+    if (assignedRole === "driver") {
+      const existingDriver = await Driver.findOne({ userId: user._id });
+
+      if (!existingDriver) {
+        await Driver.create({
+          userId: user._id,
+          name: user.name,
+          email: user.email,
+          phone: null,
+          vehicle: {
+            plateNumber: "UNASSIGNED",
+            type: "Truck",
+          },
+          vehicleType: "Truck",
+          plateNumber: "UNASSIGNED",
+          status: "available",
+        });
+      }
+    }
 
     res.status(201).json({
       message: "User registered successfully",
@@ -165,7 +183,7 @@ const updateUserRole = async (req, res) => {
       return res.status(400).json({ message: "Invalid user ID" });
     }
 
-    const allowedRoles = ["citizen", "recycler", "supervisor", "admin"];
+    const allowedRoles = ["citizen", "recycler", "supervisor", "driver", "admin"];
 
     if (!allowedRoles.includes(role)) {
       return res.status(400).json({ message: "Invalid role" });
